@@ -55,4 +55,21 @@ async function userSubmission() {
   const title = $("#story-title").val();
   const author = $("#story-author").val();
   const url = $("#story-url").val();
+  const newStory = { title, author, url };
+
+  $("#story-title").val("");
+  $("#story-author").val("");
+  $("#story-url").val("");
+
+  let storyResult = await storyList.addStory(currentUser, newStory);
+
+  storyList.stories.unshift(storyResult);
+
+  putStoriesOnPage();
 }
+
+$("#story-button").on("click", function (event) {
+  event.preventDefault();
+  userSubmission();
+  $storySubmitForm.hide();
+});
