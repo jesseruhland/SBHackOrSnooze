@@ -27,6 +27,11 @@ async function login(evt) {
   updateUIOnUserLogin();
   $signupForm.hide();
   $loginForm.hide();
+
+  //loop through all stories and add favorite class if matched
+  await getAndSetFavs();
+  //loop through all stories and add remove button if matched
+  await getAndSetOwnStories();
 }
 
 $loginForm.on("submit", login);

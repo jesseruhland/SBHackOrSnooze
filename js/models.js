@@ -24,7 +24,8 @@ class Story {
 
   getHostName() {
     // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+    let urlObj = new URL(this.url);
+    return urlObj.host;
   }
 }
 
@@ -71,22 +72,40 @@ class StoryList {
    * Returns the new Story instance
    */
 
-  async addStory(user, newStory) {
-    // UNIMPLEMENTED: complete this function!
-    const result = await axios({
-      url: `${BASE_URL}/stories`,
-      method: "POST",
-      data: {
-        token: user.loginToken,
-        story: {
-          author: newStory.author,
-          title: newStory.title,
-          url: newStory.url,
+  async addStory(username, newStory) {
+    try {
+      const result = await axios({
+        url: `${BASE_URL}/stories`,
+        method: "POST",
+        data: {
+          token: username.loginToken,
+          story: {
+            author: newStory.author,
+            title: newStory.title,
+            url: newStory.url,
+          },
         },
-      },
-    });
+      });
 
-    return new Story(result.data.story);
+      return new Story(result.data.story);
+    } catch (e) {
+      alert("There's a been an error contacting the database.");
+    }
+  }
+
+  //contact API with delete request
+  async removeStory(user, storyId) {
+    try {
+      const result = await axios({
+        url: `${BASE_URL}/stories/${storyId}`,
+        method: "DELETE",
+        data: {
+          token: user.loginToken,
+        },
+      });
+    } catch (e) {
+      alert("There's a been an error contacting the database.");
+    }
   }
 }
 
@@ -198,6 +217,63 @@ class User {
     } catch (err) {
       console.error("loginViaStoredCredentials failed", err);
       return null;
+    }
+  }
+
+  //get ownStories array from API
+  async getOwnStories(username) {
+    const token = username.loginToken;
+    try {
+      const response = await axios({
+        url: `${BASE_URL}/users/${username.username}`,
+        method: "GET",
+        params: { token },
+      });
+
+      return response.data.user.stories;
+    } catch (e) {
+      alert("There's a been an error contacting the database.");
+    }
+  }
+
+  //favorites
+
+  async getUserFavorites(username) {
+    const token = username.loginToken;
+    try {
+      const response = await axios({
+        url: `${BASE_URL}/users/${username.username}`,
+        method: "GET",
+        params: { token },
+      });
+
+      return response.data.user.favorites;
+    } catch (e) {
+      alert("There's a been an error contacting the database.");
+    }
+  }
+
+  async newFavorite(username, favoriteStoryId) {
+    try {
+      const response = await axios({
+        url: `${BASE_URL}/users/${username.username}/favorites/${favoriteStoryId}`,
+        method: "POST",
+        data: { token: username.loginToken },
+      });
+    } catch (e) {
+      alert("There's a been an error contacting the database.");
+    }
+  }
+
+  async removeFavorite(username, favoriteStoryId) {
+    try {
+      const response = await axios({
+        url: `${BASE_URL}/users/${username.username}/favorites/${favoriteStoryId}`,
+        method: "DELETE",
+        data: { token: username.loginToken },
+      });
+    } catch (e) {
+      alert("There's a been an error contacting the database.");
     }
   }
 }

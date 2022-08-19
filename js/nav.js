@@ -32,6 +32,8 @@ function updateNavOnLogin() {
   $(".main-nav-links").show();
   $navLogin.hide();
   $navLogOut.show();
+  $navSubmit.show();
+  $navFavorites.show();
   $navUserProfile.text(`${currentUser.username}`).show();
 }
 
@@ -43,3 +45,12 @@ function navSubmitClick(evt) {
 }
 
 $navSubmit.on("click", navSubmitClick);
+
+//when logged in user clicks favorites in the nav bar, show only favorites
+function navFavoriteStories(evt) {
+  console.debug("navFavoriteStories", evt);
+  hidePageComponents();
+  putFavoritesOnPage();
+}
+
+$navFavorites.on("click", navFavoriteStories);
