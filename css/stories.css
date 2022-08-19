@@ -40,3 +40,7 @@
 .favorite {
   color: red;
 }
+
+.favorite-heart:hover {
+  cursor: pointer;
+}

@@ -29,9 +29,9 @@ async function login(evt) {
   $loginForm.hide();
 
   //loop through all stories and add favorite class if matched
-  await getAndSetFavs();
+  await getAndSetFavs(storyList);
   //loop through all stories and add remove button if matched
-  await getAndSetOwnStories();
+  await getAndSetOwnStories(storyList);
 }
 
 $loginForm.on("submit", login);

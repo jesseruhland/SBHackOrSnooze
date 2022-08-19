@@ -21,3 +21,20 @@ nav {
   margin-left: auto;
   text-align: right;
 }
+
+.nav-left {
+  text-align: center;
+}
+
+.nav-left > .nav-link {
+  margin-left: 0;
+  margin-right: 0;
+  text-align: center;
+  padding-right: 5px;
+  border-right: 1px solid black;
+}
+
+#nav-submit {
+  padding-left: 5px;
+  border-left: 1px solid black;
+}

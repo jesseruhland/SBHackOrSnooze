@@ -72,6 +72,7 @@ class StoryList {
    * Returns the new Story instance
    */
 
+  //****************Written by JR */
   async addStory(username, newStory) {
     try {
       const result = await axios({
@@ -93,7 +94,8 @@ class StoryList {
     }
   }
 
-  //contact API with delete request
+  //****************Written by JR */
+  //Remove story data from API
   async removeStory(user, storyId) {
     try {
       const result = await axios({
@@ -142,25 +144,35 @@ class User {
    * - name: the user's full name
    */
 
+  //Added some error handling in the case of a username conflict  //****************Written by JR */
   static async signup(username, password, name) {
-    const response = await axios({
-      url: `${BASE_URL}/signup`,
-      method: "POST",
-      data: { user: { username, password, name } },
-    });
+    try {
+      const response = await axios({
+        url: `${BASE_URL}/signup`,
+        method: "POST",
+        data: { user: { username, password, name } },
+      });
 
-    let { user } = response.data;
+      let { user } = response.data;
+      console.log(response);
+      console.log(response.data);
 
-    return new User(
-      {
-        username: user.username,
-        name: user.name,
-        createdAt: user.createdAt,
-        favorites: user.favorites,
-        ownStories: user.stories,
-      },
-      response.data.token
-    );
+      return new User(
+        {
+          username: user.username,
+          name: user.name,
+          createdAt: user.createdAt,
+          favorites: user.favorites,
+          ownStories: user.stories,
+        },
+        response.data.token
+      );
+    } catch (error) {
+      //****************Written by JR */
+      if (error.response.status === 409) {
+        alert("Please choose a different username, this one is already taken.");
+      }
+    }
   }
 
   /** Login in user with API, make User instance & return it.
@@ -220,7 +232,9 @@ class User {
     }
   }
 
-  //get ownStories array from API
+  //OWN STORIES  //****************Written by JR */
+
+  //retrieve user's ownStories (submissions) from API
   async getOwnStories(username) {
     const token = username.loginToken;
     try {
@@ -236,8 +250,9 @@ class User {
     }
   }
 
-  //favorites
+  //FAVORITES  //****************Written by JR */
 
+  //retrieve user's favorites from API
   async getUserFavorites(username) {
     const token = username.loginToken;
     try {
@@ -253,6 +268,7 @@ class User {
     }
   }
 
+  //post new user favorite to API
   async newFavorite(username, favoriteStoryId) {
     try {
       const response = await axios({
@@ -265,6 +281,7 @@ class User {
     }
   }
 
+  //remove new user favorite from API
   async removeFavorite(username, favoriteStoryId) {
     try {
       const response = await axios({

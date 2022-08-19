@@ -13,8 +13,9 @@ const $signupForm = $("#signup-form");
 const $storySubmitForm = $("#new-story-form");
 
 const $navLogin = $("#nav-login");
-const $navSubmit = $("#nav-submit");
-const $navFavorites = $("#nav-favorites");
+const $navSubmit = $("#nav-submit"); //****************Written by JR */
+const $navFavorites = $("#nav-favorites"); //****************Written by JR */
+const $navMyStories = $("#nav-my-stories"); //****************Written by JR */
 const $navUserProfile = $("#nav-user-profile");
 const $navLogOut = $("#nav-logout");
 
@@ -28,7 +29,7 @@ function hidePageComponents() {
     $allStoriesList,
     $loginForm,
     $signupForm,
-    $storySubmitForm,
+    $storySubmitForm, //****************Written by JR */
   ];
   components.forEach((c) => c.hide());
 }

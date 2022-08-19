@@ -32,11 +32,13 @@ function updateNavOnLogin() {
   $(".main-nav-links").show();
   $navLogin.hide();
   $navLogOut.show();
-  $navSubmit.show();
-  $navFavorites.show();
+  $navSubmit.show(); //****************Written by JR */
+  $navFavorites.show(); //****************Written by JR */
+  $navMyStories.show(); //****************Written by JR */
   $navUserProfile.text(`${currentUser.username}`).show();
 }
 
+//****************Written by JR */
 // When the user clicks 'submit' in the nav bar, show submission form
 function navSubmitClick(evt) {
   console.debug("navSubmitClick", evt);
@@ -46,6 +48,7 @@ function navSubmitClick(evt) {
 
 $navSubmit.on("click", navSubmitClick);
 
+//****************Written by JR */
 //when logged in user clicks favorites in the nav bar, show only favorites
 function navFavoriteStories(evt) {
   console.debug("navFavoriteStories", evt);
@@ -54,3 +57,13 @@ function navFavoriteStories(evt) {
 }
 
 $navFavorites.on("click", navFavoriteStories);
+
+//****************Written by JR */
+//when logged in user clicks my stories in the nav bar, show only user submissions
+function navMyStories(evt) {
+  console.debug("navMyStories", evt);
+  hidePageComponents();
+  putMyStoriesOnPage();
+}
+
+$navMyStories.on("click", navMyStories);
