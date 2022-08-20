@@ -73,11 +73,14 @@ class StoryList {
    */
 
   //****************Written by JR */
-  async addStory(username, newStory) {
+  //allows user to post a new story to the API or edit an existing story if ID is passed
+  //methodText must be "POST" to post a new story or "PATCH" to edit
+  //storyId must be an empty string to post a new story
+  async addOrEditStory(username, newStory, methodText, storyId) {
     try {
       const result = await axios({
-        url: `${BASE_URL}/stories`,
-        method: "POST",
+        url: `${BASE_URL}/stories/${storyId}`,
+        method: methodText,
         data: {
           token: username.loginToken,
           story: {
@@ -108,6 +111,16 @@ class StoryList {
     } catch (e) {
       alert("There's a been an error contacting the database.");
     }
+  }
+
+  //****************Written by JR */
+  //Retrieve story data by story ID
+  async getStoryById(storyId) {
+    const response = await axios({
+      url: `${BASE_URL}/stories/${storyId}`,
+      method: "GET",
+    });
+    return response.data.story;
   }
 }
 
@@ -231,11 +244,15 @@ class User {
       return null;
     }
   }
-
+  //
+  //
+  //
+  //
   //OWN STORIES  //****************Written by JR */
 
-  //retrieve user's ownStories (submissions) from API
-  async getOwnStories(username) {
+  //retrieve user stories from API
+  //storyType must be "stories" for user submissions, or "favorites" for saved favorites
+  async getUserSavedStories(username, storyType) {
     const token = username.loginToken;
     try {
       const response = await axios({
@@ -243,37 +260,58 @@ class User {
         method: "GET",
         params: { token },
       });
-
-      return response.data.user.stories;
+      return response.data.user[storyType];
     } catch (e) {
       alert("There's a been an error contacting the database.");
     }
   }
 
+  // //retrieve user's ownStories (submissions) from API (reconfigured above)
+  // async getOwnStories(username) {
+  //   const token = username.loginToken;
+  //   try {
+  //     const response = await axios({
+  //       url: `${BASE_URL}/users/${username.username}`,
+  //       method: "GET",
+  //       params: { token },
+  //     });
+
+  //     return response.data.user.stories;
+  //   } catch (e) {
+  //     alert("There's a been an error contacting the database.");
+  //   }
+  // }
+
+  //FAVORITES  //****************Written by JR */ (reconfigured above)
+
+  // //retrieve user's favorites from API (reconfigured above)
+  // async getUserFavorites(username) {
+  //   const token = username.loginToken;
+  //   try {
+  //     const response = await axios({
+  //       url: `${BASE_URL}/users/${username.username}`,
+  //       method: "GET",
+  //       params: { token },
+  //     });
+
+  //     return response.data.user.favorites;
+  //   } catch (e) {
+  //     alert("There's a been an error contacting the database.");
+  //   }
+  // }
+  //
+  //
+  //
+  //
   //FAVORITES  //****************Written by JR */
 
-  //retrieve user's favorites from API
-  async getUserFavorites(username) {
-    const token = username.loginToken;
-    try {
-      const response = await axios({
-        url: `${BASE_URL}/users/${username.username}`,
-        method: "GET",
-        params: { token },
-      });
-
-      return response.data.user.favorites;
-    } catch (e) {
-      alert("There's a been an error contacting the database.");
-    }
-  }
-
-  //post new user favorite to API
-  async newFavorite(username, favoriteStoryId) {
+  //post or delete a user favorite story
+  //methodText must be "POST" or "DELETE"
+  async postOrDeleteFavorite(username, favoriteStoryId, methodText) {
     try {
       const response = await axios({
         url: `${BASE_URL}/users/${username.username}/favorites/${favoriteStoryId}`,
-        method: "POST",
+        method: methodText,
         data: { token: username.loginToken },
       });
     } catch (e) {
@@ -281,16 +319,29 @@ class User {
     }
   }
 
-  //remove new user favorite from API
-  async removeFavorite(username, favoriteStoryId) {
-    try {
-      const response = await axios({
-        url: `${BASE_URL}/users/${username.username}/favorites/${favoriteStoryId}`,
-        method: "DELETE",
-        data: { token: username.loginToken },
-      });
-    } catch (e) {
-      alert("There's a been an error contacting the database.");
-    }
-  }
+  // //post new user favorite to API (reconfigured above)
+  // async newFavorite(username, favoriteStoryId) {
+  //   try {
+  //     const response = await axios({
+  //       url: `${BASE_URL}/users/${username.username}/favorites/${favoriteStoryId}`,
+  //       method: "POST",
+  //       data: { token: username.loginToken },
+  //     });
+  //   } catch (e) {
+  //     alert("There's a been an error contacting the database.");
+  //   }
+  // }
+
+  // //remove new user favorite from API (reconfigured above)
+  // async removeFavorite(username, favoriteStoryId) {
+  //   try {
+  //     const response = await axios({
+  //       url: `${BASE_URL}/users/${username.username}/favorites/${favoriteStoryId}`,
+  //       method: "DELETE",
+  //       data: { token: username.loginToken },
+  //     });
+  //   } catch (e) {
+  //     alert("There's a been an error contacting the database.");
+  //   }
+  // }
 }

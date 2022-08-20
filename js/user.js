@@ -28,9 +28,9 @@ async function login(evt) {
   $signupForm.hide();
   $loginForm.hide();
 
-  //loop through all stories and add favorite class if matched
+  //loop through all stories and add favorite class if matched  //****************Written by JR */
   await getAndSetFavs(storyList);
-  //loop through all stories and add remove button if matched
+  //loop through all stories and add remove & edit button if matched  //****************Written by JR */
   await getAndSetOwnStories(storyList);
 }
 

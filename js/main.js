@@ -10,7 +10,8 @@ const $allStoriesList = $("#all-stories-list");
 const $loginForm = $("#login-form");
 const $signupForm = $("#signup-form");
 
-const $storySubmitForm = $("#new-story-form");
+const $storySubmitForm = $("#new-story-form"); //****************Written by JR */
+const $editStoryForm = $("#edit-story-form"); //****************Written by JR */
 
 const $navLogin = $("#nav-login");
 const $navSubmit = $("#nav-submit"); //****************Written by JR */

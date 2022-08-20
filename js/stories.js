@@ -60,8 +60,11 @@ async function putStoriesOnPage() {
     await getAndSetOwnStories(storyList);
   }
 }
-
-//****************Written by JR */
+//
+//
+//
+//
+// USER SUBMISSIONS //****************Written by JR */
 // function and event listener for a new story by user submission at the submit form
 async function userSubmission() {
   const title = $("#story-title").val();
@@ -73,7 +76,12 @@ async function userSubmission() {
   $("#story-author").val("");
   $("#story-url").val("");
 
-  let storyResult = await storyList.addStory(currentUser, newStory);
+  let storyResult = await storyList.addOrEditStory(
+    currentUser,
+    newStory,
+    "POST",
+    ""
+  );
 
   storyList = await StoryList.getStories();
   putStoriesOnPage();
@@ -96,7 +104,61 @@ $("body").on("click", ".remove-button", async function (event) {
   storyList = await StoryList.getStories();
   putStoriesOnPage();
 });
+//
+//
+//
+//
+//EDIT STORY  //****************Written by JR */
 
+// function and event listener to edit story by user submission at the edit form
+async function editUserSubmission() {
+  const title = $("#edit-story-title").val();
+  const author = $("#edit-story-author").val();
+  const url = $("#edit-story-url").val();
+  const storyId = $("#edit-story-id").val();
+  const editedStory = { title, author, url };
+
+  $("#edit-story-title").val("");
+  $("#edit-story-author").val("");
+  $("#edit-story-url").val("");
+  $("#edit-story-id").val("");
+
+  let storyResult = await storyList.addOrEditStory(
+    currentUser,
+    editedStory,
+    "PATCH",
+    storyId
+  );
+
+  storyList = await StoryList.getStories();
+  putStoriesOnPage();
+}
+
+//****************Written by JR */
+$("#edit-story-button").on("click", function (event) {
+  event.preventDefault();
+  editUserSubmission();
+  $editStoryForm.hide();
+});
+
+//****************Written by JR */
+//add 'edit' functionality to the edit-button class
+$("body").on("click", ".edit-button", async function (event) {
+  const storyIdtoEdit = this.closest("li").id;
+  const storyDetailsFromAPI = await storyList.getStoryById(storyIdtoEdit);
+
+  hidePageComponents();
+  $editStoryForm.show();
+
+  $("#edit-story-title").val(storyDetailsFromAPI.title);
+  $("#edit-story-author").val(storyDetailsFromAPI.author);
+  $("#edit-story-url").val(storyDetailsFromAPI.url);
+  $("#edit-story-id").val(storyIdtoEdit);
+});
+//
+//
+//
+//
 //FAVORITES  //****************Written by JR */
 
 //gets list of favorite stories from server, generates their HTML, and puts on page
@@ -105,11 +167,14 @@ async function putFavoritesOnPage() {
 
   $allStoriesList.empty();
 
-  const favoriteArray = await currentUser.getUserFavorites(currentUser);
+  const favoriteArray = await currentUser.getUserSavedStories(
+    currentUser,
+    "favorites"
+  );
   const favoriteStories = [];
 
   for (let favorite of favoriteArray) {
-    const favoriteStory = await new Story(favorite);
+    const favoriteStory = new Story(favorite);
     favoriteStories.unshift(favoriteStory);
   }
 
@@ -148,7 +213,10 @@ async function putFavoritesOnPage() {
 
 //get user favorites from API, check current selection agains saved favorites
 async function checkForFavorite(favoriteStoryId) {
-  const favoriteArray = await currentUser.getUserFavorites(currentUser);
+  const favoriteArray = await currentUser.getUserSavedStories(
+    currentUser,
+    "favorites"
+  );
   let favoriteExists = false;
   for (let story of favoriteArray) {
     if (favoriteStoryId === story.storyId) {
@@ -163,9 +231,17 @@ async function checkForFavorite(favoriteStoryId) {
 //if not already a favorite, add to API
 async function addOrRemoveFavoriteAtAPI(favoriteExists, favoriteStoryId) {
   if (favoriteExists === true) {
-    await currentUser.removeFavorite(currentUser, favoriteStoryId);
+    await currentUser.postOrDeleteFavorite(
+      currentUser,
+      favoriteStoryId,
+      "DELETE"
+    );
   } else if (favoriteExists === false) {
-    await currentUser.newFavorite(currentUser, favoriteStoryId);
+    await currentUser.postOrDeleteFavorite(
+      currentUser,
+      favoriteStoryId,
+      "POST"
+    );
   }
 }
 
@@ -188,7 +264,10 @@ $("body").on("click", ".favorite-heart", favoriteHeartClick);
 
 //loop through all stories and add favorite class if matched
 async function getAndSetFavs(storyList) {
-  const favoriteArray = await currentUser.getUserFavorites(currentUser);
+  const favoriteArray = await currentUser.getUserSavedStories(
+    currentUser,
+    "favorites"
+  );
   for (let story of storyList.stories) {
     for (let favorite of favoriteArray) {
       if (story.storyId === favorite.storyId) {
@@ -197,7 +276,10 @@ async function getAndSetFavs(storyList) {
     }
   }
 }
-
+//
+//
+//
+//
 //OWN STORIES/USER SUBMISSIONS  //****************Written by JR */
 
 //gets list of favorite stories from server, generates their HTML, and puts on page
@@ -206,15 +288,18 @@ async function putMyStoriesOnPage() {
 
   $allStoriesList.empty();
 
-  const myStoriesArray = await currentUser.getOwnStories(currentUser);
+  const myStoriesArray = await currentUser.getUserSavedStories(
+    currentUser,
+    "stories"
+  );
   const myStories = [];
 
   for (let myStory of myStoriesArray) {
-    const mine = await new Story(myStory);
+    const mine = new Story(myStory);
     myStories.unshift(mine);
   }
 
-  //check if any favorites have been saved - if not -> post message to page, if so -> retrieve, display
+  //check if any user submissions have been saved - if not -> post message to page, if so -> retrieve, display
   if (myStories.length === 0) {
     const noStoriesMessage = document.createElement("p");
     noStoriesMessage.innerText = "You haven't submitted any stories yet.";
@@ -226,10 +311,10 @@ async function putMyStoriesOnPage() {
       $("#no-stories-message").remove();
     });
   } else {
-    //add favorites stories in array to object to mimic storyList
+    //add user submission stories in array to object to mimic storyList
     let myStoriesList = { stories: myStories };
 
-    // loop through all favorite stories and generate HTML for them
+    // loop through all user submission stories and generate HTML for them
     for (let story of myStories) {
       const $story = generateStoryMarkup(story);
       $allStoriesList.append($story);
@@ -246,14 +331,18 @@ async function putMyStoriesOnPage() {
   }
 }
 
-//loop through all stories and add remove button if matched
+//loop through all stories and add remove & edit button if matched
 async function getAndSetOwnStories(storyList) {
-  const ownStoriesArray = await currentUser.getOwnStories(currentUser);
+  const ownStoriesArray = await currentUser.getUserSavedStories(
+    currentUser,
+    "stories"
+  );
   for (let story of storyList.stories) {
     for (let ownStory of ownStoriesArray) {
       if (story.storyId === ownStory.storyId) {
         $(`li#${story.storyId}`).append(
-          '<small class="remove-button"><a>remove this story</a></small>'
+          '<small class="remove-button"><a>remove</a></small>',
+          '<small class="edit-button">  <a>edit</a></small>'
         );
       }
     }
